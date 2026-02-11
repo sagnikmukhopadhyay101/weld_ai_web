@@ -1,5 +1,5 @@
 import streamlit as st
-import cv2
+
 import numpy as np
 import os
 import uuid
@@ -421,10 +421,10 @@ model = load_model()
 # CRACK DETECTION
 # ======================================================
 def detect_crack(image):
-    gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-    edges = cv2.Canny(cv2.GaussianBlur(gray, (5,5),0), 80, 180)
-    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    return sum(1 for c in contours if cv2.arcLength(c, False) > 120) >= 2, edges
+    gray = np.mean(image, axis=2).astype(np.uint8)
+    edges = np.abs(np.diff(gray, axis=0))
+    crack_score = np.sum(edges > 40)
+    return crack_score > 50000, edges
 
 # ======================================================
 # DECISION LOGIC
@@ -463,10 +463,8 @@ if uploaded and st.session_state.image is None:
     st.session_state.image = Image.open(uploaded).convert("RGB")
     st.session_state.image_np = np.array(st.session_state.image)
     st.session_state.image_path = f"temp/{uuid.uuid4().hex}.jpg"
-    cv2.imwrite(
-        st.session_state.image_path,
-        cv2.cvtColor(st.session_state.image_np, cv2.COLOR_RGB2BGR)
-    )
+    st.session_state.image.save(st.session_state.image_path)
+
 
 # ======================================================
 # SHOW IMAGE
@@ -483,7 +481,7 @@ if st.session_state.image is not None:
                 yolo = model(st.session_state.image_path, conf=0.2, imgsz=1280)
                 crack, edges = detect_crack(st.session_state.image_np)
                 st.session_state.status, st.session_state.defects = decide(yolo[0].boxes, crack)
-                st.session_state.yolo_plot = cv2.cvtColor(yolo[0].plot(), cv2.COLOR_BGR2RGB)
+                st.session_state.yolo_plot = yolo[0].plot()
                 st.session_state.edges = edges
 
 # ======================================================

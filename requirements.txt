@@ -1,7 +1,6 @@
 streamlit
 streamlit-drawable-canvas
 ultralytics
-opencv-python-headless
 pandas
 numpy
 Pillow
