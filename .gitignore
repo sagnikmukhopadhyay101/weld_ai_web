@@ -1,0 +1,5 @@
+venv/
+temp/
+manual_annotations/
+__pycache__/
+*.pyc
