@@ -1,6 +1,9 @@
-streamlit
-streamlit-drawable-canvas
+streamlit==1.28.2
+streamlit-drawable-canvas==0.9.3
 ultralytics
+opencv-python-headless
 pandas
-numpy
+numpy==1.26.4
 Pillow
+torch
+torchvision
